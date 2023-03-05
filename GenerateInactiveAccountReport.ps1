@@ -10,10 +10,10 @@ if (-Not (Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
 
 # Login to modules
 Write-Host "Waiting for Azure login..."
-Connect-AzureAD
+Connect-AzureAD | Out-Null
 
 Write-Host "Waiting for MS365 login..."
-Connect-ExchangeOnline
+Connect-ExchangeOnline -ShowBanner:$false
 
 Write-Host -ForegroundColor Yellow "Generating report..."
 
