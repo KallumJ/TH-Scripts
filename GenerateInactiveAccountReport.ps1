@@ -1,3 +1,20 @@
+# Checks whether the AzureADPreview module is installed, and if not, installs it
+if (-Not (Get-Module -ListAvailable -Name AzureADPreview)) {
+    Install-Module -Name AzureADPreview
+}
+
+# Checks whether the ExchangeOnlineManagement module is installed, and if not, installs it.
+if (-Not (Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
+    Install-Module -Name ExchangeOnlineManagement
+}
+
+# Login to modules
+Write-Host "Waiting for Azure login..."
+Connect-AzureAD
+
+Write-Host "Waiting for MS365 login..."
+Connect-ExchangeOnline
+
 Write-Host -ForegroundColor Yellow "Generating report..."
 
 try {
@@ -31,6 +48,6 @@ try {
      Write-Host -ForegroundColor Green "Successfully generated report to inactive-users.csv"
 }
 catch {
-    Throw ("Ooops! " + $error[0].Exception)
+    Throw ("Ooops! " + $error[0].ErrorDetails)
 }
 
