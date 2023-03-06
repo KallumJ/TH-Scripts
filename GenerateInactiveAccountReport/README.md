@@ -6,7 +6,7 @@ The script can be run from a Powershell terminal like:
 ```
 .\GenerateInactiveAccountReport.ps1
 ```
-Or by right clicking the file and "Run with PowerShell".
+or by right clicking the file and selecting "Run with PowerShell".
 
 The generated report can be found in the same folder the script was run from. The report will be titled "inactive-users.csv"
 
