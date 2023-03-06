@@ -1,5 +1,5 @@
 # Generate Inactive Account Report
-A script to generate a report of users who have no activity in the last 30 days.
+A script to generate a report of users who have no activity in the last 90 days.
 
 # Running the script
 The script can be run from a Powershell terminal like:
