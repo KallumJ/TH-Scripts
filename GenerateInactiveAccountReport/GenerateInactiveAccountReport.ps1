@@ -33,7 +33,9 @@ $outFile = ".\inactive-users.csv"
 
 try {
     # Remove previous report
-    Remove-Item $outFile
+    if (Test-Path $outFile) {
+        Remove-Item $outFile
+    }
 
     # Get a list of all enabled, non deleted users from AzureAD
     $users = Get-AzureADUser -All $true | Select-Object UserPrincipalName, ObjectId, DisplayName, ExtensionProperty
