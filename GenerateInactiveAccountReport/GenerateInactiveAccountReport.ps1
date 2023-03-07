@@ -40,9 +40,12 @@ try {
         # Check the unified audit log for any activity in the last 90 days from this user
         $mostRecentSignIn = Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) -ResultSize 1 -UserIds "$($user.UserPrincipalName)"
         
-        
-        $noActivityFound = $null -eq $mostRecentSignIn 
-        $oldAccount = ($user.ExtensionProperty.createdDateTime -ge (Get-Date).AddDays(-30))
+        # Parse the created date
+        $createdDate = [DateTime]::ParseExact($user.ExtensionProperty.createdDateTime, "dd/MM/yyyy HH:mm:ss", $null)
+
+        $noActivityFound = $null -eq $mostRecentSignIn
+        $oldAccount = ($createdDate -le (Get-Date).AddDays(-30))
+
         # If no activity is found and it is an old account
         if ($noActivityFound -and $oldAccount) {
             # Get the users manager manager
@@ -64,5 +67,5 @@ try {
     Write-Host -ForegroundColor Green "Successfully generated report to inactive-users.csv"
 }
 catch {
-    Throw ("Ooops! " + $error[0].ErrorDetails)
+    Throw ("Ooops! " + $error[0].Exception)
 }
