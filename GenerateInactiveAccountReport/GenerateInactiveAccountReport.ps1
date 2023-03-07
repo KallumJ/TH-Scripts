@@ -35,8 +35,6 @@ try {
     
     # For each user
     foreach ($user in $users) {
-        Write-Host "Checking user $($user.DisplayName)"
-
         # Check the unified audit log for any activity in the last 90 days from this user
         $mostRecentSignIn = Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) -ResultSize 1 -UserIds "$($user.UserPrincipalName)"
         
@@ -60,6 +58,10 @@ try {
             }
             
             $report | Export-Csv "inactive-users.csv" -NoTypeInformation -Append
+
+            Write-Host -ForegroundColor Red "$($user.DisplayName) is inactive"
+        } else {
+            Write-Host "$($user.DisplayName) is active"
         }
     }
     
