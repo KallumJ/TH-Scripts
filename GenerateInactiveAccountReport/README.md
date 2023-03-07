@@ -19,5 +19,3 @@ The generated report can be found in the same folder the script was run from. Th
 
 # Notes
 - The script will prompt for login twice, once for Azure, once for MS365. Sometimes the prompts can open behind active windows, so if you don't see it, check behind your foreground windows.
-
-- Make sure any previous "inactive-users.csv" is deleted before rerunning the script.

@@ -29,7 +29,12 @@ Connect-ExchangeOnline -ShowBanner:$false
 
 Write-Host -ForegroundColor Yellow "Generating report..."
 
+$outFile = ".\inactive-users.csv"
+
 try {
+    # Remove previous report
+    Remove-Item $outFile
+
     # Get a list of all enabled, non deleted users from AzureAD
     $users = Get-AzureADUser -All $true | Select-Object UserPrincipalName, ObjectId, DisplayName, ExtensionProperty
     
@@ -57,7 +62,7 @@ try {
                 AccountCreatedDate = $user.ExtensionProperty.createdDateTime
             }
             
-            $report | Export-Csv "inactive-users.csv" -NoTypeInformation -Append
+            $report | Export-Csv $outFile -NoTypeInformation -Append
 
             Write-Host -ForegroundColor Red "$($user.DisplayName) is inactive"
         } else {
