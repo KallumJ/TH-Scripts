@@ -1,5 +1,25 @@
-Confirm-Prerequsites
+$azureInstalled = (Get-Module -ListAvailable -Name AzureADPreview)
+$exchangeInstalled = (Get-Module -ListAvailable -Name ExchangeOnlineManagement)
+$runAsAdmin = (([Security.Principal.WindowsPrincipal] `
+            [Security.Principal.WindowsIdentity]::GetCurrent() `
+    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 
+# Checks whether we need to install a module, and if we do, checks we are running as administrator, as admin privileges are needed to install the modules
+if (-Not $runAsAdmin -and (-Not $azureInstalled -or -Not $exchangeInstalled)) {
+    Write-Host -ForegroundColor Red "You are missing one of the prerequisite modules to run this script. Please rerun this script as an administrator to allow these modules to install."
+    Pause
+    Exit
+}   
+
+# Checks whether the AzureADPreview module is installed, and if not, installs it
+if (-Not $azureInstalled) {
+    Install-Module -Name AzureADPreview
+}
+
+# Checks whether the ExchangeOnlineManagement module is installed, and if not, installs it.
+if (-Not $exchangeInstalled) {
+    Install-Module -Name ExchangeOnlineManagement
+}
 # Login to modules
 Write-Host "Waiting for Azure login..."
 Connect-AzureAD | Out-Null
@@ -20,8 +40,11 @@ try {
         # Check the unified audit log for any activity in the last 90 days from this user
         $mostRecentSignIn = Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-90) -EndDate (Get-Date) -ResultSize 1 -UserIds "$($user.UserPrincipalName)"
         
-        # If no activity is found
-        if ($null -eq $mostRecentSignIn) {
+        
+        $noActivityFound = $null -eq $mostRecentSignIn 
+        $oldAccount = ($user.ExtensionProperty.createdDateTime -ge (Get-Date).AddDays(-30))
+        # If no activity is found and it is an old account
+        if ($noActivityFound -and $oldAccount) {
             # Get the users manager manager
             $manager = Get-AzureADUserManager -ObjectId $user.ObjectId
             
@@ -42,29 +65,4 @@ try {
 }
 catch {
     Throw ("Ooops! " + $error[0].ErrorDetails)
-}
-
-function Confirm-Prerequsites {
-    $azureInstalled = (Get-Module -ListAvailable -Name AzureADPreview)
-    $exchangeInstalled = (Get-Module -ListAvailable -Name ExchangeOnlineManagement)
-    $runAsAdmin = (([Security.Principal.WindowsPrincipal] `
-                [Security.Principal.WindowsIdentity]::GetCurrent() `
-        ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
-    
-    # Checks whether we need to install a module, and if we do, checks we are running as administrator, as admin privileges are needed to install the modules
-    if (-Not $runAsAdmin -and (-Not $azureInstalled -or -Not $exchangeInstalled)) {
-        Write-Host -ForegroundColor Red "You are missing one of the prerequisite modules to run this script. Please rerun this script as an administrator to allow these modules to install."
-        Pause
-        Exit
-    }   
-    
-    # Checks whether the AzureADPreview module is installed, and if not, installs it
-    if (-Not $azureInstalled) {
-        Install-Module -Name AzureADPreview
-    }
-    
-    # Checks whether the ExchangeOnlineManagement module is installed, and if not, installs it.
-    if (-Not $exchangeInstalled) {
-        Install-Module -Name ExchangeOnlineManagement
-    }
 }
