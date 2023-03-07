@@ -33,7 +33,7 @@ Write-Host -ForegroundColor Yellow "Generating report..."
 
 try {
     # Get a list of all enabled, non deleted users from AzureAD
-    $users = Get-AzureADUser -All $true | Select-Object UserPrincipalName, ObjectId, DisplayName
+    $users = Get-AzureADUser -All $true | Select-Object UserPrincipalName, ObjectId, DisplayName, ExtensionProperty
     
     # For each user
     foreach ($user in $users) {
@@ -52,6 +52,7 @@ try {
                 Name    = $user.DisplayName
                 Email   = $user.UserPrincipalName
                 Manager = $manager.DisplayName
+                AccountCreatedDate = $user.ExtensionProperty.createdDateTime
             }
             
             $report | Export-Csv "inactive-users.csv" -NoTypeInformation -Append
