@@ -62,12 +62,13 @@ try {
                 Email              = $user.UserPrincipalName
                 Manager            = $manager.DisplayName
                 AccountCreatedDate = $user.ExtensionProperty.createdDateTime
+                Notes              = ""
             }
-            
+                        
             $report | Export-Csv $outFile -NoTypeInformation -Append
-
             Write-Host -ForegroundColor Red "$($user.DisplayName) is inactive"
-        } else {
+        }
+        else {
             Write-Host "$($user.DisplayName) is active"
         }
     }
@@ -75,6 +76,7 @@ try {
     # Confirm report is completed
     Write-Host -ForegroundColor Green "Successfully generated report to inactive-users.csv"
 }
+
 catch {
     Throw ("Ooops! " + $error[0].Exception)
 }
